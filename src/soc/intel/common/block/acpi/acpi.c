@@ -9,6 +9,7 @@
 #include <cpu/cpu.h>
 #include <cpu/intel/common/common.h>
 #include <cpu/intel/msr.h>
+#include <cpu/intel/speedstep.h>
 #include <cpu/intel/turbo.h>
 #include <cpu/x86/lapic.h>
 #include <intelblocks/acpi_wake_source.h>
@@ -360,7 +361,7 @@ __weak void soc_power_states_generation(int core_id,
 static void generate_cpu_entry(int cpu, int core, int cores_per_package)
 {
 	/* Generate processor \_SB.CPUx */
-	acpigen_write_processor_device(cpu * cores_per_package + core);
+	acpigen_write_processor(cpu * cores_per_package + core, PMB0_BASE, 0x06);
 
 	/* Generate C-state tables */
 	generate_c_state_entries();
@@ -370,7 +371,7 @@ static void generate_cpu_entry(int cpu, int core, int cores_per_package)
 	/* Soc specific power states generation */
 	soc_power_states_generation(core, cores_per_package);
 
-	acpigen_write_processor_device_end();
+	acpigen_write_processor_end();
 }
 
 void generate_cpu_entries(const struct device *device)
